@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  tailfserver:
+    image: tailfserver:dev
+    build: ./server-container
+    volumes:
+      - ./server-container/logs.txt:/tmp/logs.txt
+  tailfclient:
+    image: tailfclient:dev
+    build: ./client-container
+    depends_on:
+      - tailfserver
+    command: >
+      /bin/bash -c "
+        while ! nc -z tailfserver 8081;
+        do
+          echo sleeping;
+          sleep 1;
+        done;
+        echo Connected!;
+      "
